@@ -5,10 +5,23 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    display_name = db.Column(db.String(200), nullable=False)
-    username = db.Column(db.String(200), nullable=False)
+    username = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
+    def create(username, password):
+        created_at = datetime.now(timezone.utc)
+
+        user = User(
+            username=username,
+            password=password,
+            created_at=created_at
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        return user
+
     def __repr__(self):
-        return '<User %r>' % self.id
+        return self
