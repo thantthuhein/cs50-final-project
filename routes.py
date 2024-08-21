@@ -9,7 +9,7 @@ routes = Blueprint('main', __name__)
 
 @routes.route('/')
 def main():
-    return "URL Shortener"
+    return redirect("login")
 
 @routes.route("/register", methods=["GET", "POST"])
 def register():
@@ -35,8 +35,7 @@ def register():
 
             session["user_id"] = user.id
 
-            session.clear()
-            return jsonify({'message': 'OK'}), 200
+            return redirect("dashboard")
         except:
             session["status"] = "Username already exists!"
             return render_template("register.html")
