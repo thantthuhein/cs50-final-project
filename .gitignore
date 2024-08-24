@@ -3,3 +3,4 @@
 /envpython3
 /flask_session
 .DS_Store
+.env

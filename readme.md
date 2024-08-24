@@ -5,6 +5,8 @@
 #### Flask
 #### SQLAlchemy
 #### python-Werkzeug
+#### python-dotenv
+#### pyJWT
 
 ## Setup Guide
 
@@ -18,7 +20,7 @@ source env/bin/activate
 
 
 ```
-pip3 install flask flask-sqlalchemy
+pip3 install flask flask-sqlalchemy flask_session werkzeug python-dotenv pyJWT
 ```
 
 ```
