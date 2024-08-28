@@ -7,6 +7,8 @@ from db import db
 import dotenv
 import jwt
 import os
+import random
+import string
 
 dotenv.load_dotenv()
 
@@ -127,3 +129,43 @@ def validate_token(data):
         }, 401
 
     return None
+
+def invalidate_token(token):
+    if not token:
+        return False
+
+    decodedToken = decode_jwt_token(token)
+
+    if decodedToken is None:
+        return False
+
+    if not decodedToken["id"]:
+        return False
+
+    try:
+        result = db.session.execute(
+            select(Token).where(Token.uuid == decodedToken['id'])
+        )
+        token = result.scalars().first()
+
+        if token:
+            token.revoked = True
+            db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise
+    finally:
+        db.session.close()
+
+    return True
+
+def decode_jwt_token(token):
+    try:
+        return jwt.decode(token, secret, algorithm)
+    except:
+        return None
+
+def generate_short_url():
+    """Generate a random string of 6 characters."""
+    characters = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(characters, k=8))
