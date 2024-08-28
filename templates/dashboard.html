@@ -5,5 +5,31 @@
 {% endblock %}
 
 {% block main %}
-    <h1>Dashboard<h1/>
+    <h1 class="my-4 text-center">Short URLs</h1>
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Short URL Key</th>
+                        <th>Long URL</th>
+                        <th>Visits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for url_map in url_maps %}
+                    <tr>
+                        <td>{{ url_map.short_url }}</td>
+                        <td>{{ url_map.long_url }}</td>
+                        <td>{{ url_map.visits }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center">No URLs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

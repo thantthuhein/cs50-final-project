@@ -82,7 +82,14 @@ def login():
 @routes.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    user_id = session.get("user_id")
+
+    query = db.session.execute(
+        select(ShortUrl).where(ShortUrl.user_id == user_id)
+    )
+    url_maps = query.scalars().all()
+
+    return render_template("dashboard.html", url_maps=url_maps)
 
 @routes.route("/logout", methods=["POST"])
 @login_required
