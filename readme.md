@@ -20,7 +20,7 @@ source env/bin/activate
 
 
 ```
-pip3 install flask flask-sqlalchemy flask_session werkzeug python-dotenv pyJWT
+pip3 install flask flask-sqlalchemy flask_session werkzeug python-dotenv pyJWT validators requests
 ```
 
 ```

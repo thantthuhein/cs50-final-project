@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify, session
 from db import db
 from sqlalchemy import select
-from models import User
+from models import User, ShortUrl
 from werkzeug.security import check_password_hash
-from helpers import issue_token, token_required, invalidate_token, generate_short_url
+from helpers import issue_token, token_required, invalidate_token, generate_short_url, validate_url, get_user_from_token
 
 routes_api = Blueprint('api', __name__)
 
@@ -59,4 +59,33 @@ def logout():
 @routes_api.route(prefix + '/generate_url', methods=["POST"])
 @token_required
 def generate_url():
-    return generate_short_url()
+    data = request.get_json()
+    long_url = data.get("long_url", "")
+
+    if not long_url:
+        return jsonify({"data": {"message": "URL is required"}}), 422
+
+    if not validate_url(long_url):
+        return jsonify({"data": {"message": "URL is invalid"}}), 422
+
+    short_url = generate_short_url()
+
+    headers = request.headers
+    bearer = headers.get('Authorization')
+    token = bearer.split()[1]
+
+    user = get_user_from_token(token)
+
+    if not user:
+        return jsonify({"data": {"message": "Something went wrong"}}), 400
+
+    shortUrl = ShortUrl.create(
+        user_id=user.id,
+        short_url=short_url,
+        long_url=long_url
+    )
+
+    return jsonify({"data": {
+        "message": "Success",
+        "short_url": shortUrl.short_url
+    }}), 200

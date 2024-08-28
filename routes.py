@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
-from helpers import login_required
+from helpers import login_required, add_visits
 from sqlalchemy import select
-from models import User
+from models import User, ShortUrl
 from db import db
 
 routes = Blueprint('web', __name__)
@@ -112,3 +112,17 @@ def validateRegister(form):
         return render_template("register.html")
 
     return None
+
+@routes.route("/<short_url>", methods=["GET"])
+def redirect_to_url(short_url):
+    result = db.session.execute(
+        select(ShortUrl).where(ShortUrl.short_url == short_url)
+    )
+    url_map = result.scalars().first()
+
+    if not url_map:
+        return "<H1>404</H1>", 404
+
+    add_visits(short_url)
+
+    return redirect(url_map.long_url)

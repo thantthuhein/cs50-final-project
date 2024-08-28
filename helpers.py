@@ -1,7 +1,7 @@
 from flask import redirect, session, request
 from datetime import datetime, timezone, timedelta
 from functools import wraps
-from models import Token, User
+from models import Token, User, ShortUrl
 from sqlalchemy import select
 from db import db
 import dotenv
@@ -9,6 +9,8 @@ import jwt
 import os
 import random
 import string
+import validators
+import requests
 
 dotenv.load_dotenv()
 
@@ -169,3 +171,60 @@ def generate_short_url():
     """Generate a random string of 6 characters."""
     characters = string.ascii_uppercase + string.digits
     return ''.join(random.choices(characters, k=8))
+
+def validate_url(url):
+    if is_valid_url(url):
+        if is_url_reachable(url):
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def is_valid_url(url):
+    return validators.url(url)
+
+def is_url_reachable(url):
+    try:
+        response = requests.head(url, allow_redirects=True, timeout=5)
+
+        return response.status_code < 400
+    except requests.RequestException:
+        return False
+
+def get_user_from_token(token):
+    if not token:
+        return False
+
+    decodedToken = jwt.decode(token, secret, algorithm)
+
+    if not decodedToken["id"]:
+        return False
+
+    userQuery = db.session.execute(
+        select(User).where(User.id == decodedToken['user_id'])
+    )
+    user = userQuery.scalars().first()
+
+    if user is None:
+        return False
+
+    return user
+
+def add_visits(short_url):
+    try:
+        query = db.session.execute(
+            select(ShortUrl).where(ShortUrl.short_url == short_url)
+        )
+        url_map = query.scalars().first()
+
+        if url_map:
+            current_visits = url_map.visits
+            url_map.visits = current_visits + 1
+            db.session.commit()
+            return True
+
+        return False
+    except Exception as e:
+        db.session.rollback()
+        raise
