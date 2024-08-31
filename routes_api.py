@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from db import db
 from sqlalchemy import select
 from models import User, ShortUrl
@@ -87,5 +87,5 @@ def generate_url():
 
     return jsonify({"data": {
         "message": "Success",
-        "short_url": shortUrl.short_url
+        "short_url": request.host_url + shortUrl.short_url
     }}), 200
