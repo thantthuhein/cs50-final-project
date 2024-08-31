@@ -44,7 +44,7 @@ def login():
     return jsonify({"data": {
         "access_token": token,
         "message": "Success"
-    }}), 422
+    }}), 200
 
 @routes_api.route(prefix + '/logout', methods=["POST"])
 def logout():
