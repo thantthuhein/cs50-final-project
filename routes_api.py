@@ -65,6 +65,17 @@ def generate_url():
     if not long_url:
         return jsonify({"data": {"message": "URL is required"}}), 422
 
+    result = db.session.execute(
+        select(ShortUrl).where(ShortUrl.long_url == long_url)
+    )
+    existingShortUrl = result.scalars().first()
+
+    if existingShortUrl is not None:
+        return jsonify({"data": {
+        "message": "Success",
+        "short_url": request.host_url + existingShortUrl.short_url
+    }}), 200
+
     if not validate_url(long_url):
         return jsonify({"data": {"message": "URL is invalid"}}), 422
 
@@ -78,6 +89,7 @@ def generate_url():
 
     if not user:
         return jsonify({"data": {"message": "Something went wrong"}}), 400
+
 
     shortUrl = ShortUrl.create(
         user_id=user.id,

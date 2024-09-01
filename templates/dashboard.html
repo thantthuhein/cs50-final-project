@@ -20,7 +20,7 @@
                     {% for url_map in url_maps %}
                     <tr>
                         <td>{{ url_map.short_url }}</td>
-                        <td>{{ url_map.long_url }}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: normal; height: auto; word-wrap: break-word;">{{ url_map.long_url }}</td>
                         <td>{{ url_map.visits }}</td>
                     </tr>
                     {% else %}
